@@ -1,0 +1,1 @@
+This a django project built in its entirety in GRAPHQL as a demo test.
