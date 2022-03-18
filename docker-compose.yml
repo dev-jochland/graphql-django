@@ -1,47 +1,3 @@
-#version: '3'
-#
-#services:
-#  potgres:
-#    container_name: db-graphql-demo
-#    image: postgres
-#    environment:
-#      - POSTGRES_USER: "postgres"
-#      - POSTGRES_PASSWORD: "postgres"
-#      - PGDATE: /data/demo-graphql-postgres
-#    volumes:
-#      - postgres:/data/demo-graphql-postgres
-#    networks:
-#      - demo_graphql_net
-#    ports:
-#    - '5432:5432'
-#    expose:
-#      - "5432"
-#    restart: on-failure
-#
-#  web:
-#    build: .
-#    command: bash -c "python manage.py collectstatic --no-input && python manage.py runserver 0.0.0.0:2222"
-#    container_name: demo_graphql
-#    restart: always
-#    volumes:
-#      - .:/demo_graphql
-#    expose:
-#      - "2222"
-#    ports:
-#      - "2222:2222"
-#    environment:
-##      - POSTGRES_DB: demo_graphql_db
-#      - POSTGRES_USER: "postgres"
-#      - POSTGRES_PASSWORD: "postgres"
-#    depends_on:
-#      - potgres
-#    networks:
-#      - demo_graphql_net
-#
-#networks:
-#  demo_graphql_net:
-#    driver: bridge
-
 version: "3"
 
 services:
@@ -51,10 +7,42 @@ services:
     ports:
       - "2222:2222"
     container_name: demo_graphql
+    environment:
+      - POSTGRES_DB=graphql_demo_db_docker
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
     restart: always
+    networks:
+      - demo_graphql_net
     volumes:
       - .:/demo_graphql
     expose:
       - "2222"
     command: >
       sh -c "python manage.py runserver 0.0.0.0:2222"
+#    command: sh -c "python manage.py collectstatic --no-input && python manage.py migrate \
+#     && gunicorn demo_graphql.wsgi -b 0.0.0.0:2222"
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=graphql_demo_db_docker
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - "5432"
+    restart: on-failure
+    volumes:
+      - demo_graphql_db_data:/var/lib/postgresql/data
+    networks:
+      - demo_graphql_net
+
+networks:
+  demo_graphql_net:
+    driver: bridge
+
+volumes:
+  demo_graphql_db_data:
