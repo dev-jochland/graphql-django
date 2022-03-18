@@ -23,8 +23,8 @@ services:
       - "2222"
     command: >
       sh -c "python manage.py runserver 0.0.0.0:2222"
-#    command: sh -c "python manage.py collectstatic --no-input && python manage.py migrate \
-#     && gunicorn demo_graphql.wsgi -b 0.0.0.0:2222"
+#      to collect static, run the command below
+#    command: sh -c "python manage.py collectstatic --no-input"
 
   db:
     image: postgres
