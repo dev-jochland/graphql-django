@@ -1,1 +1,5 @@
-This a django project built in its entirety in GRAPHQL as a demo test.
+Building an Ecommerce API in GraphQL
+
+- docker-compose build
+- docker-compose up
+- Change bucket policy on AWS to allow public access
