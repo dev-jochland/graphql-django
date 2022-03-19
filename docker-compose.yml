@@ -1,3 +1,5 @@
+# Below is the docker compose configuration to run your DB on your local host machine from within docker, remember, you
+# have to create a server on your PGADMIN with the defined postgres parameters you listed below.
 version: "3"
 
 services:
@@ -9,8 +11,8 @@ services:
     container_name: demo_graphql
     environment:
       - POSTGRES_DB=graphql_demo_db_docker
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres_docker
+      - POSTGRES_PASSWORD=postgres_docker
       - POSTGRES_HOST=db
     depends_on:
       - db
@@ -30,13 +32,15 @@ services:
     image: postgres
     environment:
       - POSTGRES_DB=graphql_demo_db_docker
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    expose:
-      - "5432"
+      - POSTGRES_USER=postgres_docker
+      - POSTGRES_PASSWORD=postgres_docker
+    ports:
+#      binding port 5433 on the local machine to postgres default 5432 from within docker, to enable data be hosted on local postgres
+      - "5433:5432"
     restart: on-failure
     volumes:
-      - demo_graphql_db_data:/var/lib/postgresql/data
+#      To help persist db data, if not, anytime we run docker-compose down, we would lose all our data
+      - demo_graphql_db_data1:/var/lib/postgresql/data
     networks:
       - demo_graphql_net
 
@@ -45,4 +49,54 @@ networks:
     driver: bridge
 
 volumes:
-  demo_graphql_db_data:
+  demo_graphql_db_data1:
+
+# Below is the docker-compose configuration that runs your DB within the docker and not on the local machine
+#version: "3"
+#
+#services:
+#  web:
+#    build:
+#      context: .
+#    ports:
+#      - "2222:2222"
+#    container_name: demo_graphql
+#    environment:
+#      - POSTGRES_DB=graphql_demo_db_docker
+#      - POSTGRES_USER=postgres1
+#      - POSTGRES_PASSWORD=postgres1
+#      - POSTGRES_HOST=db
+#    depends_on:
+#      - db
+#    restart: always
+#    networks:
+#      - demo_graphql_net
+#    volumes:
+#      - .:/demo_graphql
+#    expose:
+#      - "2222"
+#    command: >
+#      sh -c "python manage.py runserver 0.0.0.0:2222"
+##      to collect static, run the command below
+##    command: sh -c "python manage.py collectstatic --no-input"
+#
+#  db:
+#    image: postgres
+#    environment:
+#      - POSTGRES_DB=graphql_demo_db_docker
+#      - POSTGRES_USER=postgres1
+#      - POSTGRES_PASSWORD=postgres1
+#    expose:
+#      - "5432"
+#    restart: on-failure
+#    volumes:
+#      - demo_graphql_db_data:/var/lib/postgresql/data
+#    networks:
+#      - demo_graphql_net
+#
+#networks:
+#  demo_graphql_net:
+#    driver: bridge
+#
+#volumes:
+#  demo_graphql_db_data:
